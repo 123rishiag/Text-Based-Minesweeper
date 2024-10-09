@@ -1,24 +1,25 @@
 #include "../../header/Gameplay/GameplayController.h"
 #include "../../header/Main/GameService.h"
 #include "../../header/Global/ServiceLocator.h"
-#include "../../header/Time/TimeService.h"
 #include <iostream>
+#include <sstream>
 
 namespace Gameplay
 {
 	using namespace Global;
-	using namespace Time;
 	using namespace Main;
 	using namespace std;
 
 	GameplayController::GameplayController()
 	{
+		board_service = nullptr;
 	}
 
 	GameplayController::~GameplayController() {}
 
 	void GameplayController::initialize()
 	{
+		board_service = ServiceLocator::getInstance()->getBoardService();
 		resetGame();
 	}
 
@@ -29,7 +30,7 @@ namespace Gameplay
 		cin >> choice;
 		if (choice == 'Y' || choice == 'y') 
 		{
-			beginGame();
+			runGame();
 		}
 		else 
 		{
@@ -52,46 +53,90 @@ namespace Gameplay
 		cout << "\nHow to Play:\n";
 		cout << "1. User will input x & y (coordinates where they want to click).\n";
 		cout << "2. In each step, check for win or lose case.\n";
-		cout << "\nTake n*n (n >= 9 && n<= 20)\n";
+		cout << "\nTake n*n (n >= " << min_cell_threshold << " && n <= " << max_cell_threshold << ")\n";
 		cout << "\nEnter Y/y to continue or any other key to close the game\n";
 	}
 
-	void GameplayController::update()
+	void GameplayController::runGame()
 	{
-		updateRemainingTime();
-
-		if (isTimeOver() && game_result == GameResult::NONE)
+		do
 		{
-			endGame(GameResult::LOST);
+			cout << "Enter the number of cells in a row: ";
+			cin >> number_of_rows;
+			if (number_of_rows < min_cell_threshold || number_of_rows>max_cell_threshold)
+			{
+				cout << "Numbers are out of range. Take n*n (n >= " << min_cell_threshold << " && n <= " << max_cell_threshold << ").\n";
+			}
+		} while (number_of_rows < min_cell_threshold || number_of_rows>max_cell_threshold);
+		numnber_of_columns = number_of_rows;
+		calculateMines();
+		cout << "---------------------------------------------\n";
+		cout << "|                GAME STARTS                |\n";
+		cout << "---------------------------------------------\n";
+
+		setGameStatus(GameStatus::STARTED);
+		board_service->resetBoard(number_of_rows, numnber_of_columns, number_of_mines);
+		startGameLoop();
+	}
+
+	void GameplayController::startGameLoop()
+	{
+		string position;
+		// Clear the newline character left in the input stream
+		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+		while (game_status != GameStatus::ENDED)
+		{
+			cout << "Enter x and y coordinates (space separated): ";
+			getline(cin, position);
+
+			vector<int> coordinates = parsePosition(position);
+			if (coordinates.size() != 2)
+			{
+				cout << "Error: Please enter exactly two space-separated integers.\n";
+				continue;
+			}
+
+			int x = coordinates[0];
+			int y = coordinates[1];
+
+			if (x < 0 || x >= number_of_rows || y < 0 || y >= numnber_of_columns)
+			{
+				cout << "Error: Coordinates out of range. Valid range is (0,0) to ("
+					<< number_of_rows - 1 << "," << numnber_of_columns - 1 << ").\n";
+				continue;
+			}
+
+			cout << "ok\n";
 		}
 	}
 
-	void GameplayController::updateRemainingTime()
+	vector<int> GameplayController::parsePosition(const string& input)
 	{
-		if (game_status == GameStatus::STARTED)
-		{
-			remaining_time -= ServiceLocator::getInstance()->getTimeService()->getDeltaTime();
-			cout << "Remaining Time: " << remaining_time << endl;
+		vector<int> result;
+		stringstream ss(input);
+		int value;
+
+		// Extract integers from the input string
+		while (ss >> value) {
+			result.push_back(value);
 		}
+
+		return result;
 	}
+
+
+	void GameplayController::update() { }
 
 	void GameplayController::render()
 	{
 		// Yet to implement
 	}
 
-	bool GameplayController::isTimeOver()
+	void GameplayController::calculateMines()
 	{
-		if (remaining_time <= 0) 
-		{
-			remaining_time = 0;
-			cout << "------------------TIME OUT-------------------\n";
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		int totalCells = number_of_rows * numnber_of_columns;
+		number_of_mines = std::max(1, static_cast<int>(totalCells * 0.15)); // At most around 15% of cells are mines
 	}
 
 	void GameplayController::gameLost()
@@ -102,26 +147,6 @@ namespace Gameplay
 	void GameplayController::gameWon()
 	{
 		setGameResult(GameResult::WON);
-	}
-
-	void GameplayController::beginGame()
-	{
-		do
-		{
-			cout << "Enter the number of cells in a row: ";
-			cin >> number_of_rows;
-			if (number_of_rows < 9 || number_of_rows>20)
-			{
-				cout << "Numbers are out of range. Take n*n (n >= 9 && n<= 20).\n";
-			}
-		} while (number_of_rows < 9 || number_of_rows>20);
-		numnber_of_columns = number_of_rows;
-		cout << "---------------------------------------------\n";
-		cout << "|                GAME STARTS                |\n";
-		cout << "---------------------------------------------\n";
-		resetGame();
-		ServiceLocator::getInstance()->getTimeService()->updatePreviousTime();
-		setGameStatus(GameStatus::STARTED);
 	}
 
 	void GameplayController::showResults()
@@ -161,22 +186,14 @@ namespace Gameplay
 	{
 		game_status = GameStatus::NONE;
 		game_result = GameResult::NONE;
-		remaining_time = max_level_duration;
+		number_of_rows = 0;
+		numnber_of_columns = 0;
+		number_of_mines = 0;
 	}
 
 	bool GameplayController::isGameOver() const
 	{
 		return (game_status == GameStatus::ENDED);
-	}
-
-	float GameplayController::getRemainingTime() const
-	{
-		return remaining_time;
-	}
-
-	int GameplayController::getMinesCount() const
-	{
-		return 0;
 	}
 
 	GameStatus GameplayController::getGameStatus() const

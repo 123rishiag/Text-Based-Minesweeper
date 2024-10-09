@@ -24,8 +24,6 @@ namespace Gameplay
 		void endGame(GameResult result);
 
 		bool isGameOver() const;
-		float getRemainingTime() const;
-		int getMinesCount() const;
 		GameResult getGameResult() const;
 	};
 }
