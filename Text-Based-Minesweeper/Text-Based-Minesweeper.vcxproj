@@ -128,6 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Gameplay\Board\BoardController.cpp" />
+    <ClCompile Include="Source\Gameplay\Board\BoardService.cpp" />
+    <ClCompile Include="Source\Gameplay\Cell\CellController.cpp" />
+    <ClCompile Include="Source\Gameplay\Cell\CellModel.cpp" />
     <ClCompile Include="Source\Gameplay\GameplayController.cpp" />
     <ClCompile Include="Source\Gameplay\GameplayService.cpp" />
     <ClCompile Include="Source\Main\GameService.cpp" />
@@ -135,6 +139,10 @@
     <ClCompile Include="Source\Time\TimeService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Header\Gameplay\Board\BoardController.h" />
+    <ClInclude Include="Header\Gameplay\Board\BoardService.h" />
+    <ClInclude Include="Header\Gameplay\Cell\CellController.h" />
+    <ClInclude Include="Header\Gameplay\Cell\CellModel.h" />
     <ClInclude Include="Header\Gameplay\GameplayController.h" />
     <ClInclude Include="Header\Gameplay\GameplayService.h" />
     <ClInclude Include="Header\Main\GameService.h" />
