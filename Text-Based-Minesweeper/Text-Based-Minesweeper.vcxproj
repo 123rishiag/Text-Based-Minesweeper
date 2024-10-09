@@ -128,11 +128,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Gameplay\GameplayController.cpp" />
+    <ClCompile Include="Source\Gameplay\GameplayService.cpp" />
     <ClCompile Include="Source\Main\GameService.cpp" />
     <ClCompile Include="Source\Global\ServiceLocator.cpp" />
     <ClCompile Include="Source\Time\TimeService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Header\Gameplay\GameplayController.h" />
+    <ClInclude Include="Header\Gameplay\GameplayService.h" />
     <ClInclude Include="Header\Main\GameService.h" />
     <ClInclude Include="Header\Global\ServiceLocator.h" />
     <ClInclude Include="Header\Time\TimeService.h" />

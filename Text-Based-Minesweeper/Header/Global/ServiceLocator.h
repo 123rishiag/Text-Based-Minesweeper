@@ -1,5 +1,6 @@
 #pragma once
 #include "../../header/Time/TimeService.h"
+#include "../../header/Gameplay/GameplayService.h"
 
 namespace Global
 {
@@ -7,6 +8,7 @@ namespace Global
     {
     private:
         Time::TimeService* time_service;
+        Gameplay::GameplayService* gameplay_service;
 
         ServiceLocator();
         ~ServiceLocator();
@@ -22,6 +24,7 @@ namespace Global
         void render();
 
         Time::TimeService* getTimeService();
+        Gameplay::GameplayService* getGameplayService();
 
         void deleteServiceLocator();
     };

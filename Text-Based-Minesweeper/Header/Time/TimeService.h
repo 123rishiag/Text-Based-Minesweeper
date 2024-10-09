@@ -19,7 +19,6 @@ namespace Time {
 
 		void updateDeltaTime(); // method to update time
 		float calculateDeltaTime() const; //calculate time by subtracting the previous time from the current time
-		void updatePreviousTime(); // finally update the current time to be previous time
 
 	public:
 
@@ -27,6 +26,7 @@ namespace Time {
 		void initialize();
 		void update();
 
+		void updatePreviousTime(); // finally update the current time to be previous time
 		//getter
 		float getDeltaTime() const;
 	};
