@@ -128,6 +128,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Main\GameService.cpp" />
+    <ClCompile Include="Source\Global\ServiceLocator.cpp" />
+    <ClCompile Include="Source\Time\TimeService.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Header\Main\GameService.h" />
+    <ClInclude Include="Header\Global\ServiceLocator.h" />
+    <ClInclude Include="Header\Time\TimeService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
