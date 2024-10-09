@@ -1,8 +1,14 @@
-#include <iostream>
-using namespace std;
+#include "header/Main/GameService.h"
+using namespace Main;
 
 int main()
 {
-	cout << "Hello World!";
-	return 0;
+    GameService* game_service = new GameService();
+    game_service->ignite();
+
+    while (game_service->isRunning())
+    {
+        game_service->update();
+        game_service->render();
+    }
 }
