@@ -45,16 +45,6 @@ namespace Gameplay
 		return gameplay_controller->isGameOver();
 	}
 
-	float GameplayService::getRemainingTime() const
-	{
-		return gameplay_controller->getRemainingTime();
-	}
-
-	int GameplayService::getMinesCount() const
-	{
-		return gameplay_controller->getMinesCount();
-	}
-
 	GameResult GameplayService::getGameResult() const
 	{
 		return gameplay_controller->getGameResult();

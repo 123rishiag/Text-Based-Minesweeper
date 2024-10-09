@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <string>
 
 namespace Gameplay
 {
@@ -24,20 +26,24 @@ namespace Gameplay
 	class GameplayController
 	{
 	private:
-		const float max_level_duration = 3.f;
-		float remaining_time;
+		const float min_cell_threshold = 9;
+		const float max_cell_threshold = 20;
 
 		int number_of_rows;
 		int numnber_of_columns;
+		int number_of_mines;
+
+		Board::BoardService* board_service;
 
 		GameStatus game_status = GameStatus::NONE;
 		GameResult game_result = GameResult::NONE;
 		void showRules();
-		void updateRemainingTime();
-		bool isTimeOver();
+		void runGame();
+		void startGameLoop();
+		std::vector<int> parsePosition(const std::string& input);
+		void calculateMines();
 		void gameLost();
 		void gameWon();
-		void beginGame();
 		void showResults();
 
 	public:
@@ -53,8 +59,6 @@ namespace Gameplay
 		void resetGame();
 
 		bool isGameOver() const;
-		float getRemainingTime() const;
-		int getMinesCount() const;
 		GameStatus getGameStatus() const;
 		void setGameStatus(GameStatus status);
 		GameResult getGameResult() const;
