@@ -5,6 +5,8 @@ namespace Gameplay
 {
 	namespace Board
 	{
+		using namespace Cell;
+
 		BoardService::BoardService()
 		{
 			board_controller = nullptr;
@@ -36,9 +38,14 @@ namespace Gameplay
 			board_controller->flagAllMines();
 		}
 
-		void BoardService::processCellInput(Cell::CellController* cell_controller)
+		void BoardService::processCellInput(int row, int column, CellAction action)
 		{
-			board_controller->processCellInput(cell_controller);
+			board_controller->processCellInput(row, column, action);
+		}
+
+		void BoardService::displayGrid()
+		{
+			board_controller->displayGrid();
 		}
 
 		void BoardService::showBoard()

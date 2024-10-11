@@ -1,4 +1,6 @@
 #include "../../header/Gameplay/GameplayController.h"
+#include "../../header/Gameplay/Board/BoardController.h"
+#include "../../header/Gameplay/Cell/CellModel.h"
 #include "../../header/Main/GameService.h"
 #include "../../header/Global/ServiceLocator.h"
 #include <iostream>
@@ -7,6 +9,8 @@
 namespace Gameplay
 {
 	using namespace Global;
+	using namespace Board;
+	using namespace Cell;
 	using namespace Main;
 	using namespace std;
 
@@ -46,22 +50,27 @@ namespace Gameplay
 		cout << "---------------------------------------------\n";
 		cout << "\nRULES:\n";
 		cout << "1. The board is divided into cells, with mines randomly distributed.\n";
-		cout << "2. To win, you need to open all the cells.\n";
+		cout << "2. To win, you need to open all the cells without triggering any mine.\n";
 		cout << "3. The number on a cell shows the number of mines adjacent to it. Using this information, you can determine\n";
 		cout << "   cells that are safe, and cells that contain mines.\n";
-		cout << "4. Interact, evolve and enjoy!\n";
+		cout << "4. You can flag cell, if you have doubts on any cell that it may contain mine doing which you won't be able to";
+		cout << " open the cell. To open you have to unflag the cell.\n";
+		cout << "5. Interact, evolve and enjoy!\n";
 		cout << "\nHow to Play:\n";
 		cout << "1. User will input x & y (coordinates where they want to click).\n";
 		cout << "2. In each step, check for win or lose case.\n";
 		cout << "\nTake n*n (n >= " << min_cell_threshold << " && n <= " << max_cell_threshold << ")\n";
-		cout << "\nEnter Y/y to continue or any other key to close the game\n";
+		cout << "\nHow to Play: \n1. Enter coordinates (space separated) to open cell. Example - 5 10";
+	    cout << "\n2. Enter coordinates and then 'F' (space separated) to flag cell. Example - 5 10 F\n";
+		cout << "\nSymbols:\n'+' - Unopened Cell \n'F' - Flagged Cell \n'*' - Mine Cell \n' ' - Blank Cell\n";
+		cout << "\nEnter Y/y to continue or any other key to close the game: ";
 	}
 
 	void GameplayController::runGame()
 	{
 		do
 		{
-			cout << "Enter the number of cells in a row: ";
+			cout << "\nEnter the number of cells in a row: ";
 			cin >> number_of_rows;
 			if (number_of_rows < min_cell_threshold || number_of_rows>max_cell_threshold)
 			{
@@ -69,7 +78,9 @@ namespace Gameplay
 			}
 		} while (number_of_rows < min_cell_threshold || number_of_rows>max_cell_threshold);
 		numnber_of_columns = number_of_rows;
-		calculateMines();
+		calculateMines(); // Setting up the mines based on rows inserted.
+
+		cout << "\n";
 		cout << "---------------------------------------------\n";
 		cout << "|                GAME STARTS                |\n";
 		cout << "---------------------------------------------\n";
@@ -85,46 +96,64 @@ namespace Gameplay
 		// Clear the newline character left in the input stream
 		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
+		board_service->displayGrid();
+
 		while (game_status != GameStatus::ENDED)
 		{
-			cout << "Enter x and y coordinates (space separated): ";
+			cout << "Enter x and y coordinates between 0 and " << number_of_rows - 1 << " (space separated) or coordinates followed by 'F' to flag: ";
 			getline(cin, position);
 
-			vector<int> coordinates = parsePosition(position);
-			if (coordinates.size() != 2)
+			vector<string> coordinates = parsePosition(position);
+			if (!(coordinates.size() == 3 && coordinates[2] == "F" || coordinates.size() == 2))
 			{
-				cout << "Error: Please enter exactly two space-separated integers.\n";
+				cout << "Error: Please enter exactly two space-separated integers or two space-separated integers followed by 'F' to flag.\n\n";
 				continue;
 			}
 
-			int x = coordinates[0];
-			int y = coordinates[1];
-
-			if (x < 0 || x >= number_of_rows || y < 0 || y >= numnber_of_columns)
+			int row, column;
+			try 
 			{
-				cout << "Error: Coordinates out of range. Valid range is (0,0) to ("
-					<< number_of_rows - 1 << "," << numnber_of_columns - 1 << ").\n";
+				row = stoi(coordinates[0]);
+				column = stoi(coordinates[1]);
+			}
+			catch (invalid_argument&) 
+			{
+				cout << "Error: Please enter exactly two space-separated integers or two space-separated integers followed by 'F' to flag.\n\n";
 				continue;
 			}
 
-			cout << "ok\n";
+			if (row < 0 || row >= number_of_rows || column < 0 || column >= numnber_of_columns)
+			{
+				cout << "Error: Coordinates out of range. Valid range is (0,0) to (" << number_of_rows - 1 << "," 
+					<< numnber_of_columns - 1 << ").\n\n";
+				continue;
+			}
+
+			if (coordinates.size() == 3 && coordinates[2] == "F")
+			{
+				board_service->processCellInput(row, column, CellAction::FLAG_CELL);
+			}
+			else
+			{
+				board_service->processCellInput(row, column, CellAction::OPEN_CELL);
+			}
 		}
 	}
 
-	vector<int> GameplayController::parsePosition(const string& input)
+	vector<string> GameplayController::parsePosition(const string& input)
 	{
-		vector<int> result;
+		vector<string> result;
 		stringstream ss(input);
-		int value;
+		string token;
 
-		// Extract integers from the input string
-		while (ss >> value) {
-			result.push_back(value);
+		// Extracting integers and any other tokens from the input string
+		while (ss >> token) 
+		{
+			result.push_back(token);  // Store both numbers and characters as strings
 		}
 
 		return result;
 	}
-
 
 	void GameplayController::update() { }
 
@@ -142,23 +171,29 @@ namespace Gameplay
 	void GameplayController::gameLost()
 	{
 		setGameResult(GameResult::LOST);
+		board_service->showBoard();
+		board_service->setBoardState(BoardState::COMPLETED);
 	}
 
 	void GameplayController::gameWon()
 	{
 		setGameResult(GameResult::WON);
+		board_service->flagAllMines();
+		board_service->setBoardState(BoardState::COMPLETED);
 	}
 
 	void GameplayController::showResults()
 	{
 		if (game_result == GameResult::LOST)
 		{
+			cout << "\n";
 			cout << "---------------------------------------------\n";
-			cout << "|                   YOU LOSE                |\n";
+			cout << "|           MINE TRIGGERED! YOU LOSE        |\n";
 			cout << "---------------------------------------------\n";
 		}
 		else if (game_result == GameResult::WON)
 		{
+			cout << "\n";
 			cout << "---------------------------------------------\n";
 			cout << "|                   YOU WIN                 |\n";
 			cout << "---------------------------------------------\n";

@@ -27,7 +27,7 @@ namespace Gameplay
 	{
 	private:
 		const float min_cell_threshold = 9;
-		const float max_cell_threshold = 20;
+		const float max_cell_threshold = 15;
 
 		int number_of_rows;
 		int numnber_of_columns;
@@ -40,7 +40,7 @@ namespace Gameplay
 		void showRules();
 		void runGame();
 		void startGameLoop();
-		std::vector<int> parsePosition(const std::string& input);
+		std::vector<std::string> parsePosition(const std::string& input);
 		void calculateMines();
 		void gameLost();
 		void gameWon();

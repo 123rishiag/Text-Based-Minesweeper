@@ -4,7 +4,7 @@ namespace Gameplay
 {
     namespace Cell
     {
-        class CellController;
+        enum class CellAction;
     }
 
     namespace Board
@@ -29,7 +29,8 @@ namespace Gameplay
 
             void flagAllMines();
 
-            void processCellInput(Cell::CellController* cell_controller);
+            void processCellInput(int row, int column, Cell::CellAction action);
+            void displayGrid();
 
             void showBoard();
             void resetBoard();
