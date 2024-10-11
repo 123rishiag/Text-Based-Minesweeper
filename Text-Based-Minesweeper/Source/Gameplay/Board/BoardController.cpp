@@ -3,6 +3,8 @@
 #include "../../../header/Gameplay/GameplayController.h"
 #include "../../../header/Gameplay/Cell/CellModel.h"
 #include "../../../header/Global/ServiceLocator.h"
+#include <iostream>
+#include <iomanip>  // For setw()
 
 namespace Gameplay
 {
@@ -10,6 +12,7 @@ namespace Gameplay
 	{
 		using namespace Global;
 		using namespace Cell;
+		using namespace std;
 
 		BoardController::BoardController() : random_engine(random_device()) //// Seeded random engine with random device
 		{
@@ -50,12 +53,81 @@ namespace Gameplay
 		{
 		}
 
-		void BoardController::processCellInput(Cell::CellController* cell_controller)
+		void BoardController::processCellInput(int row, int column, CellAction action)
 		{
 			if (board_state == BoardState::COMPLETED)
 				return; // Returning doesn't allow processing input and hence input is disabled
 
-			openCell(cell_controller->getCellRowPosition(), cell_controller->getCellColumnPosition());
+			switch (action)
+			{
+			case CellAction::OPEN_CELL:
+				openCell(row, column);
+				break;
+			case CellAction::FLAG_CELL:
+				flagCell(row, column);
+				break;
+			}
+			displayGrid();
+		}
+
+		void BoardController::displayGrid()
+		{
+			cout << "\n";
+			// Column headers
+			cout << "   ";
+			for (int column = 0; column < number_of_columns; column++)
+			{
+				cout << " " << setw(2) << column << " ";
+			}
+			cout << "\n";
+
+			// Top border
+			cout << "   ";
+			for (int column = 0; column < number_of_columns; column++)
+			{
+				cout << "----";
+			}
+			cout << "-\n";
+
+			// Grid Loop
+			for (int row = 0; row < number_of_rows; row++)
+			{
+				// Row Values
+				cout << setw(2) << row << " ";
+				for (int column = 0; column < number_of_columns; column++)
+				{
+					cout << "|";
+					switch (board[row][column]->getCellState())
+					{
+					case::Gameplay::Cell::CellState::HIDDEN:
+						cout << " + ";
+						break;
+
+					case::Gameplay::Cell::CellState::OPEN:
+						cout << " " << CellValueToString(board[row][column]->getCellValue()) << " ";  // Center the value
+						break;
+
+					case::Gameplay::Cell::CellState::FLAGGED:
+						cout << " F ";
+						break;
+					}
+				}
+				cout << "|";  // Right border
+				cout << "\n";
+
+				// Row divider
+				cout << "   ";
+				for (int column = 0; column < number_of_columns; column++)
+				{
+					cout << "----";
+				}
+				cout << "-\n";
+			}
+
+			cout << "\n";
+
+			// Mines Details
+			cout << "\Flags Left: " << getMinesCount() << "  Total Mines: " << getSelectedMinesCount() << "\n\n";
 		}
 
 		void BoardController::populateBoard(int row, int column)
@@ -216,6 +288,10 @@ namespace Gameplay
 				{
 					// Skip the iteration if it's the current cell or if the new cell position is not valid.
 					if ((a == 0 && b == 0) || !isValidCellPosition((row + a), (column + b)))
+						continue;
+
+					// If Cell is not empty, skip current iteration
+					if (board[row + a][column + b]->getCellValue() != CellValue::EMPTY)
 						continue;
 
 					// Calculate the position of the neighbouring cell.

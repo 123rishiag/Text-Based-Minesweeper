@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace Gameplay
 {
@@ -9,6 +10,12 @@ namespace Gameplay
             HIDDEN,
             OPEN,
             FLAGGED,
+        };
+
+        enum class CellAction
+        {
+            OPEN_CELL,
+            FLAG_CELL,
         };
 
         enum class CellValue
@@ -24,6 +31,35 @@ namespace Gameplay
             EIGHT,
             MINE,
         };
+
+        inline char CellValueToString(CellValue value)
+        {
+            switch (value)
+            {
+            case::Gameplay::Cell::CellValue::EMPTY:
+                return ' ';
+            case::Gameplay::Cell::CellValue::ONE:
+                return '1';
+            case::Gameplay::Cell::CellValue::TWO:
+                return '2';
+            case::Gameplay::Cell::CellValue::THREE:
+                return '3';
+            case::Gameplay::Cell::CellValue::FOUR:
+                return '4';
+            case::Gameplay::Cell::CellValue::FIVE:
+                return '5';
+            case::Gameplay::Cell::CellValue::SIX:
+                return '6';
+            case::Gameplay::Cell::CellValue::SEVEN:
+                return '7';
+            case::Gameplay::Cell::CellValue::EIGHT:
+                return '8';
+            case::Gameplay::Cell::CellValue::MINE:
+                return '*';
+            default:
+                return ' ';
+            }
+        }
 
         class CellModel
         {

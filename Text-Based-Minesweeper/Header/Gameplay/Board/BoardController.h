@@ -7,6 +7,7 @@ namespace Gameplay
     namespace Cell
     {
         class CellController;
+        enum class CellAction;
     }
 
     namespace Board
@@ -77,7 +78,8 @@ namespace Gameplay
             void openCell(int row, int column);
             void flagAllMines();
             void flagCell(int row, int column);
-            void processCellInput(Cell::CellController* cell_controller);
+            void processCellInput(int row, int column, Cell::CellAction action);
+            void displayGrid();
 
             void showBoard();
 
