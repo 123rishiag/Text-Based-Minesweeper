@@ -74,8 +74,10 @@ Welcome to **Text Based Minesweeper**, a console-based version of the classic pu
    ```bash
    git clone https://github.com/123rishiag/Text-Based-Minesweeper.git
    ```
+
 2. **Build the project** using a C++ compiler.
    - Make sure the necessary dependencies for the console environment are met.
+   
 3. **Run the executable** to start the game.
 
 ## Video Demo
