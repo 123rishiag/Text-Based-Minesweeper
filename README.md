@@ -30,17 +30,16 @@ Welcome to **Text Based Minesweeper**, a console-based version of the classic pu
 
 - **GameplayService**: Manages core gameplay mechanics, including checking win/lose conditions and processing player inputs.
   - Includes: `GameplayController`
-  
 - **BoardService**: Manages the grid layout and interactions between cells.
   - Includes: `BoardController`, `CellController`, `CellModel`
 
 ### Additional Core Components
 
-- **Main**: The entry point for the game, defined in `main.cpp`.
-  
-- **GameService**: The core service managing game initialization, updating, and state transitions.
-  
-- **ServiceLocator**: Coordinates the initialization, updating, and rendering of all services.
+- **Main**: Entry point of the game.
+- **GameService**: Core service for game initialization and management.
+  - Declares and manages all game states.
+  - Oversees the initialization, updating, and rendering of `ServiceLocator`.
+- **ServiceLocator**: Coordinates the initialization, updating, and rendering of all services, ensuring efficient communication between them.
 
 ## How to Play
 
@@ -75,10 +74,8 @@ Welcome to **Text Based Minesweeper**, a console-based version of the classic pu
    ```bash
    git clone https://github.com/123rishiag/Text-Based-Minesweeper.git
    ```
-
 2. **Build the project** using a C++ compiler.
    - Make sure the necessary dependencies for the console environment are met.
-
 3. **Run the executable** to start the game.
 
 ## Video Demo
